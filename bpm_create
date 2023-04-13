@@ -27,7 +27,7 @@ if [ ${bid_ver:0:1} != 'v' ]; then
         bid_ver="latest"
 fi
 
-echo "Creating environment for BlinkID $bid_ver $example example on port $portnum...\n"
+echo "Setting up environment for BlinkID $bid_ver $example example on port $portnum...\n"
 
 rm -rf demoapp
 mkdir demoapp
@@ -90,16 +90,16 @@ rm -rf /tmp/create_env_bid_repo_$bid_ver
 echo "Creating server..."
 
 if [ "$protocol" = "https" ]; then
-        echo "#!/usr/bin/python3" > demoapp/serve
-        echo "ip = \"$localip\"" >> demoapp/serve
-        echo "port = $portnum" >> demoapp/serve
-        echo "print( \"Access app at $localip:$portnum\" )" >> demoapp/serve
-        cat server_template.py >> demoapp/serve
+        echo "#!/usr/bin/python3" > demoapp/bpm_serve
+        echo "ip = \"$localip\"" >> demoapp/bpm_serve
+        echo "port = $portnum" >> demoapp/bpm_serve
+        echo "print( \"Access app at https://$localip:$portnum\" )" >> demoapp/bpm_serve
+        cat server_template.py >> demoapp/bpm_serve
 else
-        echo "#!/bin/bash" > demoapp/serve
-        echo "echo \"Access app at localhost:$portnum\"\n" >> demoapp/serve
-        echo "python3 -m http.server $portnum" >> demoapp/serve
+        echo "#!/bin/bash" > demoapp/bpm_serve
+        echo "echo \"Access app at http://localhost:$portnum\"\n" >> demoapp/bpm_serve
+        echo "python3 -m http.server $portnum" >> demoapp/bpm_serve
 fi
 
 echo "Launching server...\n"
-cd demoapp && chmod +x serve && ./serve
+cd demoapp && chmod +x bpm_serve && ./bpm_serve
