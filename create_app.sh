@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 if [[ $# -lt 1 ]]; then
-        echo "\nusage: ./create_env.sh [ -e example_to_run ] [ -h protocol (http/https) ] [ -p port_num ] { blinkid_version }"
+        echo "\nusage: ./create_app.sh [ -e example_to_run ] [ -h protocol (http/https) ] [ -p port_num ] { blinkid_version }"
         echo "\navailable examples:\tblinkid-camera\n\t\t\tblinkid-file\n\t\t\tidbarcode\n\t\t\tmulti-side-file\n\t\t\tmulti-side"
         exit 1
 fi
@@ -57,10 +57,10 @@ cp -rf /tmp/create_env_bid_repo_$bid_ver/examples/$example/javascript/* demoapp
 cp -rf /tmp/create_env_bid_repo_$bid_ver/resources demoapp
 
 if [ "$protocol" = "https" ]; then
-        awk -v d="\"https://$localip\:$portnum/resources\"" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
+        awk -v d="\"https://$localip\:$portnum/resources\";" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
         mv demoapp/tmpapp.js demoapp/app.js
 else
-        awk -v d="\"http://$localip\:$portnum/resources\"" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
+        awk -v d="\"http://$localip\:$portnum/resources\";" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
         mv demoapp/tmpapp.js demoapp/app.js
 fi
 
@@ -71,14 +71,18 @@ echo "Demo app set up!\n"
 echo "Removing temporary files...\n"
 rm -rf /tmp/create_env_bid_repo_$bid_ver
 
-echo "Launching server..."
+echo "Creating server..."
+
 if [ "$protocol" = "https" ]; then
-        cp ssl_server.sh demoapp/serve.sh
-#        cd demoapp && chmod +x serve.sh && ./serve.sh $localip $portnum
+        echo "#!/usr/bin/python3" > demoapp/serve
+        echo "ip = \"$localip\"" >> demoapp/serve
+        echo "port = $portnum" >> demoapp/serve
+        cat server_template.py >> demoapp/serve
 else
-        echo "python3 -m http.server $portnum" > demoapp/serve.sh
-#        cd demoapp && chmod +x serve.sh && ./serve.sh
+        echo "#!/bin/bash" > demoapp/serve
+        echo "python3 -m http.server $portnum" >> demoapp/serve
 fi
 
-echo "Access the app at $localip : $portnum\n"
-cd demoapp && chmod +x serve.sh && ./serve.sh $localip $portnum
+echo "Launching server..."
+echo "Access the app at $localip : $portnum"
+cd demoapp && chmod +x serve && ./serve
