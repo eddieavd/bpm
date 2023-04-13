@@ -11,7 +11,7 @@ portnum="8372"
 protocol="http"
 bid_ver="latest"
 
-while getopts e:p:h: flag
+while getopts e:p:h:k: flag
 do
         case "${flag}" in
                 e) example=${OPTARG};;
@@ -64,13 +64,8 @@ echo "Setting up demo app..."
 cp -rf /tmp/create_env_bid_repo_$bid_ver/examples/$example/javascript/* demoapp
 cp -rf /tmp/create_env_bid_repo_$bid_ver/resources demoapp
 
-if [ "$protocol" = "https" ]; then
-        awk -v d="\"https://$localip\:$portnum/resources\";" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
-        mv demoapp/tmpapp.js demoapp/app.js
-else
-        awk -v d="\"http://$localip\:$portnum/resources\";" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
-        mv demoapp/tmpapp.js demoapp/app.js
-fi
+awk -v d="\"$protocol://$localip\:$portnum/resources\";" '$1=="loadSettings.engineLocations"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
+mv demoapp/tmpapp.js demoapp/app.js
 
 awk '!/loadSettings.workerLocation/' demoapp/app.js > demoapp/tmpapp.js
 mv demoapp/tmpapp.js demoapp/app.js
