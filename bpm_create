@@ -70,7 +70,7 @@ mv demoapp/tmpapp.js demoapp/app.js
 awk '!/loadSettings.workerLocation/' demoapp/app.js > demoapp/tmpapp.js
 mv demoapp/tmpapp.js demoapp/app.js
 
-echo "Enter license key: "
+echo "License key: "
 read licensekey < "${keyfile:-/dev/stdin}"
 
 awk -v d="\"$licensekey\"" '$2=="licenseKey"{$4=d} 1' demoapp/app.js > demoapp/tmpapp.js
