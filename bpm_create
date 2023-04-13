@@ -7,7 +7,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 example="blinkid-camera"
-portnum="4443"
+portnum="8372"
 protocol="http"
 bid_ver="latest"
 
