@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 if [[ $# -lt 1 ]]; then
-        echo "\nusage: ./create_app.sh [ -e example_to_run ] [ -k license_key_file ] [ -h protocol (http/https) ] [ -p port_num ] { blinkid_version }"
+        echo "\nusage: ./create_app [ -e example_to_run ] [ -k license_key_file ] [ -h protocol (http/https) ] [ -p port_num ] { blinkid_version }"
         echo "\navailable examples:\tblinkid-camera\n\t\t\tblinkid-file\n\t\t\tidbarcode\n\t\t\tmulti-side-file\n\t\t\tmulti-side"
         exit 1
 fi
@@ -27,7 +27,7 @@ if [ ${bid_ver:0:1} != 'v' ]; then
         bid_ver="latest"
 fi
 
-echo "Setting up environment for BlinkID $bid_ver $example example on port $portnum...\n"
+echo "Setting up environment for BlinkID $bid_ver $example example app on port $portnum...\n"
 
 rm -rf demoapp
 mkdir demoapp
@@ -52,34 +52,39 @@ else
         localip="localhost"
 fi
 
-echo "Cloning BlinkID In-browser SDK $bid_ver"
-if [ "$bid_ver" = "latest" ]; then
-        git clone --depth 1 git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+echo "Cloning BlinkID In-browser SDK $bid_ver ..."
+
+if [ -d "/tmp/create_env_bid_repo_$bid_ver" ]; then
+        echo "Found cached version!\n"
 else
-        git clone --depth 1 --branch $bid_ver git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+        if [ "$bid_ver" = "latest" ]; then
+                git clone --depth 1 git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+        else
+                git clone --depth 1 --branch $bid_ver git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+        fi
+        echo "Repo cloned!\n"
 fi
-echo "Repo cloned!\n"
 
 echo "Setting up demo app..."
 cp -rf /tmp/create_env_bid_repo_$bid_ver/examples/$example/javascript/* demoapp
 cp -rf /tmp/create_env_bid_repo_$bid_ver/resources demoapp
 
 awk -v d="\"$protocol://$localip\:$portnum/resources\";" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
-mv demoapp/tmpapp.js demoapp/app.js
 
-awk '!/loadSettings.workerLocation/' demoapp/app.js > demoapp/tmpapp.js
-mv demoapp/tmpapp.js demoapp/app.js
+awk '!/loadSettings.workerLocation/' demoapp/tmpapp.js > demoapp/app.js
+rm demoapp/tmpapp.js
 
 echo "License key: "
 read licensekey < "${keyfile:-/dev/stdin}"
 
-awk -v d="\"$licensekey\"" '$2=="licenseKey"{$4=d} 1' demoapp/app.js > demoapp/tmpapp.js
-mv demoapp/tmpapp.js demoapp/app.js
+if [ -z "$licensekey" ]; then
+        echo "Using default license key."
+else
+        awk -v d="\"$licensekey\"" '$2=="licenseKey"{$4=d} 1' demoapp/app.js > demoapp/tmpapp.js
+        mv demoapp/tmpapp.js demoapp/app.js
+fi
 
 echo "Demo app set up!\n"
-
-echo "Removing temporary files...\n"
-rm -rf /tmp/create_env_bid_repo_$bid_ver
 
 echo "Creating server..."
 
