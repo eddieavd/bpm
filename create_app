@@ -9,6 +9,7 @@ fi
 example="blinkid-camera"
 portnum="4443"
 protocol="http"
+bid_ver="latest"
 
 while getopts e:p:h: flag
 do
@@ -21,6 +22,10 @@ do
 done
 
 bid_ver=${@: -1}
+
+if [ ${bid_ver:0:1} != 'v' ]; then
+        bid_ver="latest"
+fi
 
 echo "Creating environment for BlinkID $bid_ver $example example on port $portnum...\n"
 
@@ -49,7 +54,11 @@ else
 fi
 
 echo "Cloning BlinkID In-browser SDK $bid_ver"
-git clone --depth 1 --branch $bid_ver git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+if [ "$bid_ver" = "latest" ]; then
+        git clone --depth 1 git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+else
+        git clone --depth 1 --branch $bid_ver git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+fi
 echo "Repo cloned!\n"
 
 echo "Setting up demo app..."
