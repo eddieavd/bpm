@@ -6,6 +6,21 @@ if [[ $# -lt 1 ]]; then
         exit 1
 fi
 
+ssl_server_template="import sys
+import ssl
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+httpd = HTTPServer( ( ip, port ), SimpleHTTPRequestHandler )
+
+httpd.socket = ssl.wrap_socket(
+                httpd.socket,
+                keyfile     = \"cert/ip_key.pem\",
+                certfile    = \"cert/ip.pem\",
+                server_side = True
+)
+
+httpd.serve_forever()"
+
 example="blinkid-camera"
 portnum="8372"
 protocol="http"
@@ -93,7 +108,7 @@ if [ "$protocol" = "https" ]; then
         echo "ip = \"$localip\"" >> demoapp/bpm_serve
         echo "port = $portnum" >> demoapp/bpm_serve
         echo "print( \"Access app at https://$localip:$portnum\" )" >> demoapp/bpm_serve
-        cat server_template.py >> demoapp/bpm_serve
+        echo "$ssl_server_template" >> demoapp/bpm_serve
 else
         echo "#!/bin/bash" > demoapp/bpm_serve
         echo "echo \"Access app at http://localhost:$portnum\"\n" >> demoapp/bpm_serve
