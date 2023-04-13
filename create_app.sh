@@ -77,9 +77,11 @@ if [ "$protocol" = "https" ]; then
         echo "#!/usr/bin/python3" > demoapp/serve
         echo "ip = \"$localip\"" >> demoapp/serve
         echo "port = $portnum" >> demoapp/serve
+        echo "print( \"Starting app at $localip:$portnum...\" )" >> demoapp/serve
         cat server_template.py >> demoapp/serve
 else
         echo "#!/bin/bash" > demoapp/serve
+        echo "echo \"Starting app at localhost:$portnum...\"" >> demoapp/serve
         echo "python3 -m http.server $portnum" >> demoapp/serve
 fi
 
