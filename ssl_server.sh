@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys
 import ssl
 from http.server import HTTPServer, SimpleHTTPRequestHandler

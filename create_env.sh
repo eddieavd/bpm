@@ -72,12 +72,13 @@ echo "Removing temporary files...\n"
 rm -rf /tmp/create_env_bid_repo_$bid_ver
 
 echo "Launching server..."
-echo "Access the app at $localip : $portnum\n"
-
 if [ "$protocol" = "https" ]; then
-        cp ssl_server.py demoapp/serve.py
-        cd demoapp && python3 serve.py $localip $portnum
+        cp ssl_server.sh demoapp/serve.sh
+#        cd demoapp && chmod +x serve.sh && ./serve.sh $localip $portnum
 else
         echo "python3 -m http.server $portnum" > demoapp/serve.sh
-        cd demoapp && chmod +x serve.sh && ./serve.sh
+#        cd demoapp && chmod +x serve.sh && ./serve.sh
 fi
+
+echo "Access the app at $localip : $portnum\n"
+cd demoapp && chmod +x serve.sh && ./serve.sh $localip $portnum
