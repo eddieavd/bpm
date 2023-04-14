@@ -72,10 +72,19 @@ echo "Cloning BlinkID In-browser SDK $bid_ver ..."
 if [ -d "/tmp/create_env_bid_repo_$bid_ver" ]; then
         echo "Found cached version!\n"
 else
+        echo "Cloning via SSH..."
         if [ "$bid_ver" = "latest" ]; then
                 git clone --depth 1 git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
         else
                 git clone --depth 1 --branch $bid_ver git@github.com:blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+        fi
+        if [ -d "/tmp/create_env_bid_repo_$bid_ver" ]; then
+                echo "Retrying via HTTPS..."
+                if [ "$bid_ver" = "latest" ]; then
+                        git clone --depth 1 https://github.com/blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+                else
+                        git clone --depth 1 --branch $bid_ver https://github.com/blinkid/blinkid-in-browser /tmp/create_env_bid_repo_$bid_ver
+                fi
         fi
         echo "Repo cloned!\n"
 fi
@@ -84,7 +93,7 @@ echo "Setting up demo app..."
 cp -rf /tmp/create_env_bid_repo_$bid_ver/examples/$example/javascript/* demoapp
 cp -rf /tmp/create_env_bid_repo_$bid_ver/resources demoapp
 
-awk -v d="\"$protocol://$localip\:$portnum/resources\";" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
+awk -v d="window.location.origin + \"/resources\"" '$1=="loadSettings.engineLocation"{$3=d} 1' demoapp/app.js > demoapp/tmpapp.js
 
 awk '!/loadSettings.workerLocation/' demoapp/tmpapp.js > demoapp/app.js
 rm demoapp/tmpapp.js
