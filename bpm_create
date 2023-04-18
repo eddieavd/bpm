@@ -2,7 +2,8 @@
 
 if [[ $# -lt 1 ]]; then
         echo "\nusage: ./create_app [ -e example_to_run ] [ -k license_key_file ] [ -h protocol (http/https) ] [ -p port_num ] { blinkid_version }"
-        echo "\navailable examples:\tblinkid-camera\n\t\t\tblinkid-file\n\t\t\tidbarcode\n\t\t\tmulti-side-file\n\t\t\tmulti-side"
+        echo "\navailable examples v5:\tblinkid-camera\n\t\t\tblinkid-file\n\t\t\tidbarcode\n\t\t\tmulti-side-file\n\t\t\tmulti-side"
+        echo "\navailable examples v6:\tblinkid-camera\n\t\t\tblinkid-file\n\t\t\tidbarcode\n\t\t\tcombined-file\n\t\t\tcombined"
         exit 1
 fi
 
